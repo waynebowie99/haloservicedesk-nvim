@@ -1,22 +1,23 @@
 local M = {}
 
+-- Default options
+M.opts = {
+    client_id = nil,
+    client_secret = nil,
+    base_url = nil,
+    auth_url = nil,
+    scope = "all",
+    output = "quickfix",
+}
+
 -- Setup function for user configuration
 function M.setup(opts)
-    opts = vim.tbl_deep_extend("force", {
-        client_id = nil,
-        client_secret = nil,
-        base_url = "https://ithelp.petersoncontractors.com/api",
-        auth_url = "https://ithelp.petersoncontractors.com/auth/token",
-        scope = "all",
-        output = "quickfix", -- quickfix | floating
-    }, opts or {})
-    if not opts.api_key then
+    M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
+    if not M.opts.api_key then
         vim.notify("[Halo] API key is required!", vim.log.levels.ERROR)
-        return
     end
-    if not opts.base_url then
+    if not M.opts.base_url then
         vim.notify("[Halo] Base URL is required!", vim.log.levels.ERROR)
-        return
     end
 end
 
