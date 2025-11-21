@@ -54,7 +54,50 @@ function M.get_tickets(ticket_type, opts)
                 url,
             },
             on_exit = function(j, return_val)
-                -- same logic as before for displaying tickets
+                if return_val ~= 0 then
+                    vim.schedule(function()
+                        vim.notify("[Halo] Failed to fetch tickets", vim.log.levels.ERROR)
+                    end)
+                    return
+                end
+
+                local result = table.concat(j:result(), "\n")
+                local ok, tickets = pcall(vim.json.decode, result)
+                if not ok then
+                    vim.schedule(function()
+                        vim.notify("[Halo] Invalid JSON response", vim.log.levels.ERROR)
+                    end)
+                    return
+                end
+
+                vim.schedule(function()
+                    if opts.output == "quickfix" then
+                        local qf_list = {}
+                        for _, t in ipairs(tickets) do
+                            table.insert(qf_list, { text = string.format("#%s %s", t.id, t.title) })
+                        end
+                        vim.fn.setqflist(qf_list)
+                        vim.cmd("copen")
+                    elseif opts.output == "floating" then
+                        local buf = vim.api.nvim_create_buf(false, true)
+                        local lines = {}
+                        for _, t in ipairs(tickets) do
+                            table.insert(lines, string.format("#%s %s", t.id, t.title))
+                        end
+                        vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+                        local width = math.floor(vim.o.columns * 0.6)
+                        local height = math.floor(vim.o.lines * 0.6)
+                        vim.api.nvim_open_win(buf, true, {
+                            relative = "editor",
+                            width = width,
+                            height = height,
+                            row = math.floor((vim.o.lines - height) / 2),
+                            col = math.floor((vim.o.columns - width) / 2),
+                            style = "minimal",
+                            border = "rounded",
+                        })
+                    end
+                end)
             end,
         }):start()
     end)

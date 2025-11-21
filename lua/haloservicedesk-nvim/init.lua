@@ -13,12 +13,12 @@ M.opts = {
 -- Setup function for user configuration
 function M.setup(opts)
     M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
-    if not M.opts.api_key then
-        vim.notify("[Halo] API key is required!", vim.log.levels.ERROR)
-    end
-    if not M.opts.base_url then
-        vim.notify("[Halo] Base URL is required!", vim.log.levels.ERROR)
-    end
+    -- if not M.opts.client_id then
+    --     vim.notify("[Halo] API key is required!", vim.log.levels.ERROR)
+    -- end
+    -- if not M.opts.client_secret then
+    --     vim.notify("[Halo] Base URL is required!", vim.log.levels.ERROR)
+    -- end
 end
 
 -- Command registration
